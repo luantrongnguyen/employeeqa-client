@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(Get-Process *)",
+      "PowerShell(Copy-Item *)",
+      "Bash(npm install *)"
+    ]
+  }
+}

@@ -1,0 +1,153 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum ThreadStatus {
+  open
+  answered
+  hidden
+  closed
+}
+
+enum SenderType {
+  employee
+  admin
+}
+
+enum NotificationType {
+  new_question
+  new_reply
+}
+
+model Admin {
+  id           String   @id @default(uuid()) @db.Uuid
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @map("password_hash") @db.VarChar(255)
+  displayName  String   @map("display_name") @db.VarChar(100)
+  isActive     Boolean  @default(true) @map("is_active")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  messages          Message[]
+  featuredQuestions FeaturedQuestion[]
+  notificationReads NotificationRead[]
+
+  @@map("admins")
+}
+
+model Tag {
+  id        String   @id @default(uuid()) @db.Uuid
+  nameVi    String   @map("name_vi") @db.VarChar(100)
+  nameEn    String   @map("name_en") @db.VarChar(100)
+  color     String   @default("#6B7280") @db.VarChar(7)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz()
+
+  threadTags ThreadTag[]
+
+  @@map("tags")
+}
+
+model QuestionThread {
+  id          String       @id @default(uuid()) @db.Uuid
+  accessToken String       @unique @map("access_token") @db.VarChar(64)
+  status      ThreadStatus @default(open)
+  isFeatured  Boolean      @default(false) @map("is_featured")
+  expiresAt   DateTime?    @map("expires_at") @db.Timestamptz()
+  createdAt   DateTime     @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt   DateTime     @updatedAt @map("updated_at") @db.Timestamptz()
+
+  messages      Message[]
+  tags          ThreadTag[]
+  featured      FeaturedQuestion?
+  notifications Notification[]
+
+  @@index([accessToken])
+  @@index([createdAt(sort: Desc)])
+  @@index([status])
+  @@index([isFeatured])
+  @@index([expiresAt])
+  @@map("question_threads")
+}
+
+model Message {
+  id                String     @id @default(uuid()) @db.Uuid
+  threadId          String     @map("thread_id") @db.Uuid
+  senderType        SenderType @map("sender_type")
+  adminId           String?    @map("admin_id") @db.Uuid
+  content           String
+  imageUrl          String?    @map("image_url") @db.VarChar(500)
+  imageOriginalName String?    @map("image_original_name") @db.VarChar(255)
+  imageSizeBytes    Int?       @map("image_size_bytes")
+  isHidden          Boolean    @default(false) @map("is_hidden")
+  createdAt         DateTime   @default(now()) @map("created_at") @db.Timestamptz()
+
+  thread        QuestionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  admin         Admin?         @relation(fields: [adminId], references: [id], onDelete: SetNull)
+  notifications Notification[]
+
+  @@index([threadId, createdAt])
+  @@map("messages")
+}
+
+model ThreadTag {
+  threadId String @map("thread_id") @db.Uuid
+  tagId    String @map("tag_id") @db.Uuid
+
+  thread QuestionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  tag    Tag            @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([threadId, tagId])
+  @@map("thread_tags")
+}
+
+model FeaturedQuestion {
+  id                String   @id @default(uuid()) @db.Uuid
+  threadId          String   @unique @map("thread_id") @db.Uuid
+  publishedQuestion String   @map("published_question")
+  publishedAnswer   String   @map("published_answer")
+  publishedImageUrl String?  @map("published_image_url") @db.VarChar(500)
+  publishedBy       String?  @map("published_by") @db.Uuid
+  isVisible         Boolean  @default(true) @map("is_visible")
+  displayOrder      Int      @default(0) @map("display_order")
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz()
+  updatedAt         DateTime @updatedAt @map("updated_at") @db.Timestamptz()
+
+  thread    QuestionThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  publisher Admin?         @relation(fields: [publishedBy], references: [id], onDelete: SetNull)
+
+  @@index([isVisible, displayOrder])
+  @@map("featured_questions")
+}
+
+model Notification {
+  id        String           @id @default(uuid()) @db.Uuid
+  threadId  String           @map("thread_id") @db.Uuid
+  messageId String           @map("message_id") @db.Uuid
+  type      NotificationType
+  createdAt DateTime         @default(now()) @map("created_at") @db.Timestamptz()
+
+  thread  QuestionThread   @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  message Message          @relation(fields: [messageId], references: [id], onDelete: Cascade)
+  reads   NotificationRead[]
+
+  @@index([createdAt(sort: Desc)])
+  @@map("notifications")
+}
+
+model NotificationRead {
+  notificationId String   @map("notification_id") @db.Uuid
+  adminId        String   @map("admin_id") @db.Uuid
+  readAt         DateTime @default(now()) @map("read_at") @db.Timestamptz()
+
+  notification Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+  admin        Admin        @relation(fields: [adminId], references: [id], onDelete: Cascade)
+
+  @@id([notificationId, adminId])
+  @@index([adminId])
+  @@map("notification_reads")
+}
