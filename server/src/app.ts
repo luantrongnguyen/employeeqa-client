@@ -33,7 +33,8 @@ app.use(cors({
   origin: (origin, callback) => {
     if (!origin) return callback(null, true)
     if (ALLOWED_ORIGINS.has(origin)) return callback(null, true)
-    if (/^http:\/\/192\.168\.\d{1,3}\.\d{1,3}:\d+$/.test(origin)) return callback(null, true)
+    if (/^https?:\/\/192\.168\.\d{1,3}\.\d{1,3}(:\d+)?$/.test(origin)) return callback(null, true)
+    if (/^https?:\/\/localhost(:\d+)?$/.test(origin)) return callback(null, true)
     callback(new Error('CORS not allowed'))
   },
   credentials: true,
