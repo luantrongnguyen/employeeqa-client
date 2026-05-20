@@ -21,7 +21,7 @@ export default function LoginPage() {
   const setAuth = useAuthStore((s) => s.setAuth)
 
   const { register, handleSubmit, control, formState: { errors } } = useForm<FormValues>({
-    defaultValues: { rememberMe: false },
+    defaultValues: { rememberMe: true },
   })
 
   const loginMutation = useMutation({
