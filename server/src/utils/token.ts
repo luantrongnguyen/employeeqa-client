@@ -11,11 +11,11 @@ export interface TokenPayload {
   username: string
 }
 
-export const signAccessToken = (payload: TokenPayload): string =>
-  jwt.sign(payload, ACCESS_SECRET, { expiresIn: ACCESS_EXPIRES } as jwt.SignOptions)
+export const signAccessToken = (payload: TokenPayload, expiresIn?: string): string =>
+  jwt.sign(payload, ACCESS_SECRET, { expiresIn: expiresIn ?? ACCESS_EXPIRES } as jwt.SignOptions)
 
-export const signRefreshToken = (payload: TokenPayload): string =>
-  jwt.sign(payload, REFRESH_SECRET, { expiresIn: REFRESH_EXPIRES } as jwt.SignOptions)
+export const signRefreshToken = (payload: TokenPayload, expiresIn?: string): string =>
+  jwt.sign(payload, REFRESH_SECRET, { expiresIn: expiresIn ?? REFRESH_EXPIRES } as jwt.SignOptions)
 
 export const verifyAccessToken = (token: string): TokenPayload =>
   jwt.verify(token, ACCESS_SECRET) as TokenPayload

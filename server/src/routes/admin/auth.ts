@@ -12,15 +12,14 @@ import { ok, unauthorized, badRequest } from '../../utils/response'
 const router = Router()
 
 const REFRESH_COOKIE = 'refresh_token'
-const COOKIE_OPTS = {
+const baseCookieOpts = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
   sameSite: 'lax' as const,
-  maxAge: 7 * 24 * 60 * 60 * 1000,
 }
 
 router.post('/login', async (req, res) => {
-  const { username, password } = req.body as { username?: string; password?: string }
+  const { username, password, rememberMe } = req.body as { username?: string; password?: string; rememberMe?: boolean }
   if (!username || !password) {
     badRequest(res, 'username and password are required')
     return
@@ -39,10 +38,14 @@ router.post('/login', async (req, res) => {
   }
 
   const payload = { adminId: admin.id, username: admin.username }
-  const accessToken = signAccessToken(payload)
-  const refreshToken = signRefreshToken(payload)
+  const accessToken = signAccessToken(payload, rememberMe ? '8h' : '2h')
+  const refreshToken = signRefreshToken(payload, rememberMe ? '30d' : '1d')
 
-  res.cookie(REFRESH_COOKIE, refreshToken, COOKIE_OPTS)
+  const cookieOpts = rememberMe
+    ? { ...baseCookieOpts, maxAge: 30 * 24 * 60 * 60 * 1000 }
+    : baseCookieOpts
+
+  res.cookie(REFRESH_COOKIE, refreshToken, cookieOpts)
   ok(res, {
     accessToken,
     admin: {

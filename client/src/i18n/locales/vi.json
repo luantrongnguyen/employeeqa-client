@@ -80,6 +80,7 @@
       "username": "Tên đăng nhập",
       "password": "Mật khẩu",
       "submit": "Đăng nhập",
+      "rememberMe": "Ghi nhớ đăng nhập (duy trì phiên 8 giờ)",
       "error": "Tên đăng nhập hoặc mật khẩu không đúng"
     },
     "questions": {

@@ -125,6 +125,7 @@ export interface UpdateFeaturedPayload {
 export interface LoginPayload {
   username: string
   password: string
+  rememberMe?: boolean
 }
 
 export interface LoginResponse {

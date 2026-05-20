@@ -80,6 +80,7 @@
       "username": "Username",
       "password": "Password",
       "submit": "Login",
+      "rememberMe": "Remember me (stay logged in for 8 hours)",
       "error": "Invalid username or password"
     },
     "questions": {

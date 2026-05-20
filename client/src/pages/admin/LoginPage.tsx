@@ -1,5 +1,5 @@
-import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress } from '@mui/material'
-import { useForm } from 'react-hook-form'
+import { Box, Paper, Typography, TextField, Button, Alert, CircularProgress, FormControlLabel, Checkbox } from '@mui/material'
+import { useForm, Controller } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { usePageTitle } from '@/hooks/usePageTitle'
@@ -11,6 +11,7 @@ import LanguageToggle from '@/components/shared/LanguageToggle'
 interface FormValues {
   username: string
   password: string
+  rememberMe: boolean
 }
 
 export default function LoginPage() {
@@ -19,7 +20,9 @@ export default function LoginPage() {
   const navigate = useNavigate()
   const setAuth = useAuthStore((s) => s.setAuth)
 
-  const { register, handleSubmit, formState: { errors } } = useForm<FormValues>()
+  const { register, handleSubmit, control, formState: { errors } } = useForm<FormValues>({
+    defaultValues: { rememberMe: false },
+  })
 
   const loginMutation = useMutation({
     mutationFn: adminService.login,
@@ -71,6 +74,18 @@ export default function LoginPage() {
             helperText={errors.password?.message}
             sx={{ mb: 2 }}
             autoComplete="current-password"
+          />
+
+          <Controller
+            name="rememberMe"
+            control={control}
+            render={({ field }) => (
+              <FormControlLabel
+                control={<Checkbox {...field} checked={field.value} size="small" />}
+                label={t('admin.login.rememberMe')}
+                sx={{ mb: 1 }}
+              />
+            )}
           />
 
           {loginMutation.isError && (
