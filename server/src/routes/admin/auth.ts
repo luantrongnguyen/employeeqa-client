@@ -25,7 +25,7 @@ router.post('/login', async (req, res) => {
     return
   }
 
-  const admin = await prisma.admin.findUnique({ where: { username } })
+  const admin = await prisma.admin.findUnique({ where: { username: username.toLowerCase().trim() } })
   if (!admin || !admin.isActive) {
     unauthorized(res, 'Invalid credentials')
     return
