@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import {
   Box, Paper, Typography, TextField, Button, Alert, Snackbar,
-  Divider, Stack, CircularProgress,
+  Divider, Stack, CircularProgress, Chip,
 } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
 import OpenInNewIcon from '@mui/icons-material/OpenInNew'
+import LabelIcon from '@mui/icons-material/Label'
 import { useTranslation } from 'react-i18next'
 import { usePageTitle } from '@/hooks/usePageTitle'
 import { useForm } from 'react-hook-form'
@@ -20,14 +21,21 @@ interface FormValues {
 }
 
 export default function HomePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   usePageTitle('employee.title')
   const navigate = useNavigate()
   const [imageUrl, setImageUrl] = useState<string | null>(null)
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([])
+  const [tagError, setTagError] = useState(false)
   const [generatedToken, setGeneratedToken] = useState<string | null>(null)
   const [copySnack, setCopySnack] = useState(false)
 
   const { register, handleSubmit, formState: { errors }, reset } = useForm<FormValues>()
+
+  const { data: tags = [] } = useQuery({
+    queryKey: ['tags-public'],
+    queryFn: employeeService.getTags,
+  })
 
   const { data: featured } = useQuery({
     queryKey: ['featured-public'],
@@ -35,12 +43,14 @@ export default function HomePage() {
   })
 
   const submitMutation = useMutation({
-    mutationFn: (payload: { content: string; imageUrl?: string }) =>
+    mutationFn: (payload: { content: string; imageUrl?: string; tagIds: string[] }) =>
       employeeService.createQuestion(payload),
     onSuccess: (data) => {
       setGeneratedToken(data.accessToken)
       reset()
       setImageUrl(null)
+      setSelectedTagIds([])
+      setTagError(false)
     },
   })
 
@@ -50,8 +60,19 @@ export default function HomePage() {
     return res.url
   }
 
+  const toggleTag = (id: string) => {
+    setTagError(false)
+    setSelectedTagIds((prev) =>
+      prev.includes(id) ? prev.filter((t) => t !== id) : [...prev, id]
+    )
+  }
+
   const onSubmit = (values: FormValues) => {
-    submitMutation.mutate({ content: values.content, imageUrl: imageUrl ?? undefined })
+    if (selectedTagIds.length === 0) {
+      setTagError(true)
+      return
+    }
+    submitMutation.mutate({ content: values.content, imageUrl: imageUrl ?? undefined, tagIds: selectedTagIds })
   }
 
   const threadUrl = generatedToken
@@ -87,6 +108,8 @@ export default function HomePage() {
     setImageUrl(null)
   }
 
+  const isVi = i18n.language === 'vi'
+
   return (
     <Box>
       <Paper sx={{ p: 4, mb: 4 }}>
@@ -111,8 +134,44 @@ export default function HomePage() {
               })}
               error={!!errors.content}
               helperText={errors.content?.message}
-              sx={{ mb: 2 }}
+              sx={{ mb: 3 }}
             />
+
+            {/* Tag selection */}
+            <Box sx={{ mb: 2 }}>
+              <Stack direction="row" alignItems="center" spacing={0.5} mb={1}>
+                <LabelIcon sx={{ fontSize: 18, color: tagError ? 'error.main' : 'text.secondary' }} />
+                <Typography variant="body2" fontWeight={600} color={tagError ? 'error.main' : 'text.primary'}>
+                  {t('employee.selectTopic')}
+                  <Typography component="span" color="error.main" ml={0.3}>*</Typography>
+                </Typography>
+              </Stack>
+              <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 1 }}>
+                {tags.map((tag) => {
+                  const selected = selectedTagIds.includes(tag.id)
+                  return (
+                    <Chip
+                      key={tag.id}
+                      label={isVi ? tag.nameVi : tag.nameEn}
+                      onClick={() => toggleTag(tag.id)}
+                      variant={selected ? 'filled' : 'outlined'}
+                      sx={{
+                        borderColor: tag.color,
+                        color: selected ? 'white' : tag.color,
+                        bgcolor: selected ? tag.color : 'transparent',
+                        fontWeight: selected ? 600 : 400,
+                        '&:hover': { bgcolor: selected ? tag.color : `${tag.color}18` },
+                      }}
+                    />
+                  )
+                })}
+              </Box>
+              {tagError && (
+                <Typography variant="caption" color="error.main" sx={{ mt: 0.5, display: 'block' }}>
+                  {t('employee.tagRequired')}
+                </Typography>
+              )}
+            </Box>
 
             <ImageUpload
               onUpload={handleUpload}

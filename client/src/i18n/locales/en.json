@@ -42,6 +42,8 @@
     "attachImage": "Attach image",
     "changeImage": "Change image",
     "removeImage": "Remove image",
+    "selectTopic": "Topic",
+    "tagRequired": "Please select at least one topic",
     "submitQuestion": "Submit question",
     "successTitle": "Question submitted!",
     "successDesc": "Save the link below to track your question and answers.",

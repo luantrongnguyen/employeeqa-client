@@ -20,10 +20,15 @@ const THREAD_EXPIRY_DAYS = 30
 
 // Create new anonymous question
 router.post('/questions', submitLimiter, async (req, res) => {
-  const { content, imageUrl } = req.body as { content?: string; imageUrl?: string }
+  const { content, imageUrl, tagIds } = req.body as { content?: string; imageUrl?: string; tagIds?: string[] }
 
   if (!content?.trim() || content.trim().length < 10) {
     badRequest(res, 'content must be at least 10 characters')
+    return
+  }
+
+  if (!Array.isArray(tagIds) || tagIds.length === 0) {
+    badRequest(res, 'at least one tag is required')
     return
   }
 
@@ -41,6 +46,9 @@ router.post('/questions', submitLimiter, async (req, res) => {
           content: content.trim(),
           imageUrl: imageUrl ?? null,
         },
+      },
+      tags: {
+        create: tagIds.map((tagId) => ({ tagId })),
       },
     },
     include: { messages: true },

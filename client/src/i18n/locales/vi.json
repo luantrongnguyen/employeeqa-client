@@ -42,6 +42,8 @@
     "attachImage": "Đính kèm ảnh",
     "changeImage": "Đổi ảnh",
     "removeImage": "Xóa ảnh",
+    "selectTopic": "Chủ đề",
+    "tagRequired": "Vui lòng chọn ít nhất một chủ đề",
     "submitQuestion": "Gửi câu hỏi",
     "successTitle": "Câu hỏi đã được gửi!",
     "successDesc": "Hãy lưu lại đường link dưới đây để theo dõi câu trả lời.",

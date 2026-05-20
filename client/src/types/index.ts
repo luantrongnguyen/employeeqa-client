@@ -93,6 +93,7 @@ export interface PaginatedResponse<T> {
 export interface CreateQuestionPayload {
   content: string
   imageUrl?: string
+  tagIds: string[]
 }
 
 export interface CreateMessagePayload {
