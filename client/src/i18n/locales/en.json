@@ -42,6 +42,11 @@
     "attachImage": "Attach image",
     "changeImage": "Change image",
     "removeImage": "Remove image",
+    "nav": {
+      "askQuestion": "Ask a Question",
+      "featuredQA": "Featured Q&A"
+    },
+    "noFeatured": "No featured questions yet.",
     "selectTopic": "Topic",
     "tagRequired": "Please select at least one topic",
     "submitQuestion": "Submit question",

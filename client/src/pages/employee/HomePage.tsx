@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import {
   Box, Paper, Typography, TextField, Button, Alert, Snackbar,
-  Divider, Stack, CircularProgress, Chip,
+  Stack, CircularProgress, Chip,
 } from '@mui/material'
 import SendIcon from '@mui/icons-material/Send'
 import ContentCopyIcon from '@mui/icons-material/ContentCopy'
@@ -14,7 +14,6 @@ import { useMutation, useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { employeeService } from '@/services/employeeService'
 import ImageUpload from '@/components/shared/ImageUpload'
-import FeaturedList from '@/components/employee/FeaturedList'
 
 interface FormValues {
   content: string
@@ -35,11 +34,6 @@ export default function HomePage() {
   const { data: tags = [] } = useQuery({
     queryKey: ['tags-public'],
     queryFn: employeeService.getTags,
-  })
-
-  const { data: featured } = useQuery({
-    queryKey: ['featured-public'],
-    queryFn: employeeService.getFeatured,
   })
 
   const submitMutation = useMutation({
@@ -233,13 +227,6 @@ export default function HomePage() {
           </Box>
         )}
       </Paper>
-
-      {featured && featured.length > 0 && (
-        <>
-          <Divider sx={{ mb: 4 }} />
-          <FeaturedList items={featured} />
-        </>
-      )}
 
       <Snackbar
         open={copySnack}

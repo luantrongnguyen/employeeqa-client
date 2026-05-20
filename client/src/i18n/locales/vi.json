@@ -42,6 +42,11 @@
     "attachImage": "Đính kèm ảnh",
     "changeImage": "Đổi ảnh",
     "removeImage": "Xóa ảnh",
+    "nav": {
+      "askQuestion": "Đặt câu hỏi",
+      "featuredQA": "Câu hỏi hay"
+    },
+    "noFeatured": "Chưa có câu hỏi nổi bật nào.",
     "selectTopic": "Chủ đề",
     "tagRequired": "Vui lòng chọn ít nhất một chủ đề",
     "submitQuestion": "Gửi câu hỏi",

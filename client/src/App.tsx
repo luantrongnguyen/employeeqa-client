@@ -10,6 +10,7 @@ import AdminLayout from '@/layouts/AdminLayout'
 import RequireAuth from '@/layouts/RequireAuth'
 
 import HomePage from '@/pages/employee/HomePage'
+import FeaturedPublicPage from '@/pages/employee/FeaturedPublicPage'
 import ThreadPage from '@/pages/employee/ThreadPage'
 import LoginPage from '@/pages/admin/LoginPage'
 import QuestionsListPage from '@/pages/admin/QuestionsListPage'
@@ -37,6 +38,7 @@ export default function App() {
             {/* Employee site */}
             <Route element={<EmployeeLayout />}>
               <Route index element={<HomePage />} />
+              <Route path="featured" element={<FeaturedPublicPage />} />
               <Route path="q/:accessToken" element={<ThreadPage />} />
             </Route>
 
