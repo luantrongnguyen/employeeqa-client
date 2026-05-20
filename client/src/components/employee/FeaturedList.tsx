@@ -15,7 +15,6 @@ interface Props {
 export default function FeaturedList({ items }: Props) {
   const { t, i18n } = useTranslation()
   const [selectedTag, setSelectedTag] = useState<string | null>(null)
-  
 
   const { data: tags } = useQuery({
     queryKey: ['tags-public'],
