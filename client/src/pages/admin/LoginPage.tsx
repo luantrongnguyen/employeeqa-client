@@ -104,9 +104,6 @@ export default function LoginPage() {
               boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
             }}
           />
-          <Typography variant="h6" fontWeight={700} color="white" letterSpacing={0.5}>
-            Enrich Co., Inc.
-          </Typography>
           <Typography variant="body2" color="rgba(255,255,255,0.75)" sx={{ mt: 0.5 }}>
             Employee Q&A — Admin Portal
           </Typography>
